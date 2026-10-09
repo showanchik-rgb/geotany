@@ -78,13 +78,14 @@
     ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
     ::-webkit-scrollbar-thumb:hover { background: #475569; }
   
-    /* Mobile Touch & iOS Optimization */
+    /* Mobile Touch & Edge Polishing */
     html {
       -webkit-text-size-adjust: 100%;
       scroll-behavior: smooth;
     }
     body {
       overflow-x: hidden;
+      background-color: #090d16;
     }
     @media screen and (max-width: 768px) {
       input, select, textarea {
@@ -93,13 +94,22 @@
     }
     .touch-scroll {
       -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .touch-scroll::-webkit-scrollbar {
+      display: none;
+    }
+    @media (max-width: 768px) {
+      .edge-fade-mask {
+        mask-image: linear-gradient(to right, transparent, black 16px, black calc(100% - 16px), transparent 100%);
+        -webkit-mask-image: linear-gradient(to right, transparent, black 16px, black calc(100% - 16px), transparent 100%);
+      }
     }
     @supports (padding-bottom: env(safe-area-inset-bottom)) {
       main {
         padding-bottom: calc(env(safe-area-inset-bottom) + 6rem) !important;
       }
     }
-
   </style>
 </head>
 <body class="bg-space-950 text-slate-100 min-h-screen flex flex-col selection:bg-brand-500 selection:text-white">
@@ -108,12 +118,12 @@
   <div id="toastContainer"></div>
 
   <!-- Top App Navigation Header -->
-  <header class="sticky top-0 z-50 bg-space-900/95 backdrop-blur-md border-b border-slate-800">
-        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2">
+  <header class="sticky top-0 z-50 bg-space-900/95 backdrop-blur-md border-b border-slate-800/80">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2 sm:gap-4">
       
       <!-- Brand Logo -->
       <div class="flex items-center space-x-2 sm:space-x-3 shrink-0">
-        <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-cyan-500 flex items-center justify-center shadow-lg shadow-brand-500/25">
+        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-cyan-500 flex items-center justify-center shadow-lg shadow-brand-500/25 shrink-0">
           <span class="text-base sm:text-xl">🧭</span>
         </div>
         <div>
@@ -121,7 +131,7 @@
             <span class="font-extrabold text-base sm:text-xl tracking-tight text-white">Geo<span class="text-brand-400">Tany</span></span>
             <span class="text-[9px] sm:text-[10px] px-1.5 sm:px-2 py-0.5 rounded-full bg-brand-500/10 text-brand-400 border border-brand-500/30 font-semibold tracking-wide hidden lg:inline-block">100% BLOOKET</span>
           </div>
-          <p class="text-[10px] text-slate-400 hidden md:block">118 Blooket жинағы мен 6 дағдылы жүйе</p>
+          <p id="headerSubtitle" class="text-[10px] text-slate-400 hidden md:block">118 Blooket жинағы мен 6 дағдылы жүйе</p>
         </div>
       </div>
 
@@ -138,7 +148,7 @@
         </div>
 
         <!-- Total XP -->
-        <div class="flex items-center space-x-1 bg-space-850 px-2 sm:px-3 py-1 sm:py-1.5 rounded-xl border border-amber-500/40 shadow-inner shrink-0">
+        <div class="flex items-center space-x-1 bg-space-850 px-2 sm:px-3.5 py-1 sm:py-1.5 rounded-xl border border-amber-500/40 shadow-inner shrink-0">
           <span class="text-amber-400 text-xs sm:text-sm">⚡</span>
           <div class="text-left">
             <span class="block text-xs font-black text-amber-300 leading-none tracking-wide" id="hudXp">0 XP</span>
@@ -146,10 +156,10 @@
           </div>
         </div>
 
-        <!-- Student Profile / Registration Button -->
-        <button onclick="handleProfileOrRegisterClick()" id="headerProfileBtn" class="h-8 sm:h-9 px-2.5 sm:px-3.5 rounded-xl bg-gradient-to-r from-cyan-600 to-brand-600 hover:from-cyan-500 hover:to-brand-500 text-white font-extrabold text-xs transition shadow-lg shadow-brand-500/20 flex items-center justify-center space-x-1.5 border border-brand-400/30 shrink-0">
+        <!-- Student Profile / Registration Button (Compact Icon on Mobile, No Text Clipping) -->
+        <button onclick="handleProfileOrRegisterClick()" id="headerProfileBtn" class="h-8 sm:h-9 w-8 sm:w-auto px-2 sm:px-3.5 rounded-xl bg-gradient-to-r from-cyan-600 to-brand-600 hover:from-cyan-500 hover:to-brand-500 text-white font-extrabold text-xs transition shadow-lg shadow-brand-500/20 flex items-center justify-center space-x-1.5 border border-brand-400/30 shrink-0">
           <span id="headerProfileIcon" class="text-sm sm:text-base">👤</span>
-          <span class="hidden sm:inline" id="headerProfileName">Профиль</span>
+          <span class="hidden md:inline" id="headerProfileName">Профиль</span>
         </button>
 
         <!-- Language Selector -->
@@ -163,9 +173,9 @@
       </div>
     </div>
 
-        <!-- THE 6 MAIN SKILL BUTTONS (EXACT TABS FROM SPREADSHEET) -->
+      <!-- THE 6 MAIN SKILL BUTTONS (EXACT TABS FROM SPREADSHEET) -->
     <div class="border-t border-slate-800 bg-space-950/95 sticky top-16 z-40 backdrop-blur-md">
-      <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 flex space-x-2 overflow-x-auto py-2 sm:py-2.5 no-scrollbar touch-scroll scroll-smooth">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex space-x-2 overflow-x-auto py-2.5 no-scrollbar touch-scroll scroll-smooth edge-fade-mask">
         
         <!-- 1. Blooket (Vocabulary) -->
         <button onclick="switchMainPart('blooket_vocab')" id="nav-btn-blooket_vocab" class="part-nav-btn shrink-0 whitespace-nowrap px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-xl text-xs font-extrabold transition flex items-center space-x-1.5 bg-brand-500 text-white shadow-lg shadow-brand-500/25">
@@ -561,17 +571,17 @@
   </div>
 
   <!-- Main Active Content Container -->
-  <main class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-6 lg:p-8 space-y-5 sm:space-y-6 pb-32 sm:pb-20">
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-4 sm:space-y-6 pb-32 sm:pb-20">
 
-    <!-- Active Part Banner -->
-    <div class="bg-gradient-to-r from-space-900 via-space-850 to-space-900 border border-slate-800 rounded-3xl p-5 sm:p-6 shadow-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-      <div class="flex items-center space-x-4">
-        <div class="w-14 h-14 rounded-2xl bg-brand-500/20 text-brand-400 border border-brand-500/30 flex items-center justify-center text-3xl shadow-inner" id="activePartIcon">
+        <!-- Active Part Banner (Mobile-Optimized & Polished Edges) -->
+    <div class="bg-gradient-to-r from-space-900 via-space-850 to-space-900 border border-slate-800/90 rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <div class="flex items-start sm:items-center space-x-3.5 sm:space-x-4">
+        <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-brand-500/20 text-brand-400 border border-brand-500/30 flex items-center justify-center text-2xl sm:text-3xl shadow-inner shrink-0" id="activePartIcon">
           🎮
         </div>
-        <div>
+        <div class="min-w-0 flex-1">
           <span class="text-[10px] font-extrabold uppercase tracking-widest text-brand-400" id="activePartBadge">1-БӨЛІМ (ТАБЛИЦА)</span>
-          <h1 class="text-xl sm:text-2xl font-black text-white mt-0.5" id="activePartTitle">Blooket (Vocabulary) — Сөздік және номенклатураны бекіту</h1>
+          <h1 class="text-lg sm:text-2xl font-black text-white mt-0.5 leading-snug" id="activePartTitle">Blooket (Vocabulary) — Сөздік және номенклатураны бекіту</h1>
           <p class="text-xs text-slate-400 mt-1 max-w-2xl leading-relaxed" id="activePartDesc">
             Кестедегі барлық 118 тақырып бойынша Blooket жинақтары. Ойнап болған соң «Аяқтадым (+20 XP)» басыңыз — радар диаграммасы өседі!
           </p>
@@ -579,12 +589,12 @@
       </div>
 
       <!-- Quick Action: Open 6-sided Radar modal -->
-      <button onclick="toggleProfileModal()" class="bg-space-950 hover:bg-space-850 px-4 py-2.5 rounded-2xl border border-slate-700/80 flex items-center space-x-3 transition">
+      <button onclick="toggleProfileModal()" class="w-full md:w-auto bg-space-950/80 hover:bg-space-850 px-4 py-2.5 rounded-xl sm:rounded-2xl border border-slate-700/80 flex items-center justify-between md:justify-start space-x-3 transition group shrink-0">
         <div class="text-left">
           <span class="text-[10px] text-slate-400 uppercase tracking-widest block font-bold">Радар диаграмма</span>
-          <span class="text-xs font-bold text-brand-400">Шеберлікті көру →</span>
+          <span class="text-xs font-bold text-brand-400 group-hover:text-brand-300 transition">Шеберлікті көру →</span>
         </div>
-        <span class="text-xl">📊</span>
+        <span class="text-xl group-hover:scale-110 transition">📊</span>
       </button>
     </div>
 
@@ -595,7 +605,7 @@
       <!-- Filter and search bar -->
       <div class="bg-space-900 border border-slate-800 rounded-2xl p-4 flex flex-col md:flex-row gap-3 justify-between items-center">
         <!-- Module pills inside Blooket -->
-        <div class="flex items-center space-x-2 overflow-x-auto w-full md:w-auto pb-1 md:pb-0" id="blooketModuleFilters">
+        <div class="flex items-center space-x-2 overflow-x-auto w-full md:w-auto pb-1 md:pb-0" id="blooketModuleFilters" class="flex items-center space-x-2 overflow-x-auto w-full md:w-auto pb-1 md:pb-0 touch-scroll edge-fade-mask">
           <button onclick="filterBlooket('all')" class="bk-pill px-3 py-1.5 rounded-lg text-xs font-bold bg-brand-500 text-white whitespace-nowrap" data-mod="all">
             Барлығы (118)
           </button>
@@ -1216,9 +1226,26 @@
       }
     };
 
-    // Gamification State (Saved in LocalStorage - Clean 0 Start for Students)
+        // Gamification State (Saved in LocalStorage - Clean 0 Start for Students)
     let userXp = parseInt(safeStorage.getItem('geotany_user_xp') || '0');
-    let completedBlooketTopics = new Set(JSON.parse(safeStorage.getItem('geotany_vocab_completed') || '[]'));
+    // Auto-wipe legacy test XP (850 or 880):
+    if (userXp === 850 || userXp === 880 || isNaN(userXp)) {
+      userXp = 0;
+      safeStorage.setItem('geotany_user_xp', '0');
+    }
+
+    let storedCompleted = safeStorage.getItem('geotany_vocab_completed');
+    let completedBlooketTopics;
+    try {
+      let parsed = JSON.parse(storedCompleted || '[]');
+      if (Array.isArray(parsed) && (parsed.includes(71) || parsed.includes(65) || (parsed.length > 5 && userXp === 0))) {
+        parsed = [];
+        safeStorage.setItem('geotany_vocab_completed', '[]');
+      }
+      completedBlooketTopics = new Set(parsed);
+    } catch(e) {
+      completedBlooketTopics = new Set();
+    }
 
     let skillScores = {
       vocab: 0,
@@ -2017,7 +2044,7 @@
       const isDual = (currentLang === 'dual');
 
       // Top brand sub-text
-      const subTextEl = document.querySelector('header .text-xs.text-slate-400');
+      const subTextEl = document.getElementById('headerSubtitle');
       if (subTextEl) {
         subTextEl.textContent = isRu 
           ? 'Все 118 тематических наборов Blooket и 6-навыковая система'
@@ -2271,10 +2298,10 @@
         const sec = document.getElementById(`section-${p}`);
 
         if (p === partId) {
-          btn.className = "part-nav-btn px-4 py-2 rounded-xl text-xs font-extrabold transition flex items-center space-x-2 bg-brand-500 text-white shadow-lg shadow-brand-500/25 whitespace-nowrap";
+          btn.className = "part-nav-btn shrink-0 whitespace-nowrap px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-xl text-xs font-extrabold transition flex items-center space-x-1.5 bg-brand-500 text-white shadow-lg shadow-brand-500/25";
           sec.classList.remove('hidden');
         } else {
-          btn.className = "part-nav-btn px-4 py-2 rounded-xl text-xs font-extrabold transition flex items-center space-x-2 bg-space-850 text-slate-400 hover:text-white hover:bg-space-800 whitespace-nowrap";
+          btn.className = "part-nav-btn shrink-0 whitespace-nowrap px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-xl text-xs font-extrabold transition flex items-center space-x-1.5 bg-space-850 text-slate-400 hover:text-white hover:bg-space-800";
           sec.classList.add('hidden');
         }
       });
