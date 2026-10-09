@@ -77,6 +77,39 @@
     ::-webkit-scrollbar-track { background: #0f172a; }
     ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
     ::-webkit-scrollbar-thumb:hover { background: #475569; }
+  
+    /* Mobile Touch & Edge Polishing */
+    html {
+      -webkit-text-size-adjust: 100%;
+      scroll-behavior: smooth;
+    }
+    body {
+      overflow-x: hidden;
+      background-color: #090d16;
+    }
+    @media screen and (max-width: 768px) {
+      input, select, textarea {
+        font-size: 16px !important;
+      }
+    }
+    .touch-scroll {
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .touch-scroll::-webkit-scrollbar {
+      display: none;
+    }
+    @media (max-width: 768px) {
+      .edge-fade-mask {
+        mask-image: linear-gradient(to right, transparent, black 16px, black calc(100% - 16px), transparent 100%);
+        -webkit-mask-image: linear-gradient(to right, transparent, black 16px, black calc(100% - 16px), transparent 100%);
+      }
+    }
+    @supports (padding-bottom: env(safe-area-inset-bottom)) {
+      main {
+        padding-bottom: calc(env(safe-area-inset-bottom) + 6rem) !important;
+      }
+    }
   </style>
 </head>
 <body class="bg-space-950 text-slate-100 min-h-screen flex flex-col selection:bg-brand-500 selection:text-white">
@@ -85,60 +118,53 @@
   <div id="toastContainer"></div>
 
   <!-- Top App Navigation Header -->
-  <header class="sticky top-0 z-50 bg-space-900/95 backdrop-blur-md border-b border-slate-800">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+  <header class="sticky top-0 z-50 bg-space-900/95 backdrop-blur-md border-b border-slate-800/80">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2 sm:gap-4">
       
       <!-- Brand Logo -->
-      <div class="flex items-center space-x-3">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-cyan-500 flex items-center justify-center shadow-lg shadow-brand-500/25">
-          <span class="text-xl">🧭</span>
+      <div class="flex items-center space-x-2 sm:space-x-3 shrink-0">
+        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-cyan-500 flex items-center justify-center shadow-lg shadow-brand-500/25 shrink-0">
+          <span class="text-base sm:text-xl">🧭</span>
         </div>
         <div>
-          <div class="flex items-center space-x-2">
-            <span class="font-extrabold text-xl tracking-tight text-white">Geo<span class="text-brand-400">Tany</span></span>
-            <span class="text-[10px] px-2 py-0.5 rounded-full bg-brand-500/10 text-brand-400 border border-brand-500/30 font-semibold tracking-wide hidden md:inline-block">100% BLOOKET СІЛТЕМЕЛЕРІ</span>
+          <div class="flex items-center space-x-1.5">
+            <span class="font-extrabold text-base sm:text-xl tracking-tight text-white">Geo<span class="text-brand-400">Tany</span></span>
+            <span class="text-[9px] sm:text-[10px] px-1.5 sm:px-2 py-0.5 rounded-full bg-brand-500/10 text-brand-400 border border-brand-500/30 font-semibold tracking-wide hidden lg:inline-block">100% BLOOKET</span>
           </div>
-          <p class="text-xs text-slate-400 hidden sm:block">Барлық 118 тақырыптық Blooket және 6 дағдылы жүйе</p>
+          <p id="headerSubtitle" class="text-[10px] text-slate-400 hidden md:block">118 Blooket жинағы мен 6 дағдылы жүйе</p>
         </div>
       </div>
 
-      <!-- Gamification Stats HUD -->
-      <div class="flex items-center space-x-2 sm:space-x-4">
+      <!-- Gamification Stats HUD & User Controls (Mobile-Optimized) -->
+      <div class="flex items-center space-x-1.5 sm:space-x-3 shrink-0">
         
         <!-- Day Streak -->
-        <div class="flex items-center space-x-1.5 bg-space-850 px-3 py-1.5 rounded-xl border border-slate-700/60 shadow-inner">
-          <span class="text-amber-400 text-lg animate-bounce">🔥</span>
+        <div class="flex items-center space-x-1 bg-space-850 px-2 sm:px-3 py-1 sm:py-1.5 rounded-xl border border-slate-700/60 shadow-inner shrink-0">
+          <span class="text-amber-400 text-sm sm:text-base animate-bounce">🔥</span>
           <div class="text-left">
-            <span class="block text-xs font-bold text-amber-300 leading-none" id="streakDays">1 күн</span>
-            <span class="text-[9px] text-slate-400 uppercase tracking-wider">Серия</span>
+            <span class="block text-xs font-bold text-amber-300 leading-none" id="streakDays">1к</span>
+            <span class="hidden sm:inline text-[9px] text-slate-400 uppercase tracking-wider ml-0.5">Серия</span>
           </div>
         </div>
 
         <!-- Total XP -->
-        <div class="flex items-center space-x-1.5 bg-space-850 px-3.5 py-1.5 rounded-xl border border-amber-500/40 shadow-inner shadow-amber-500/10">
-          <span class="text-amber-400 text-base">⚡</span>
+        <div class="flex items-center space-x-1 bg-space-850 px-2 sm:px-3.5 py-1 sm:py-1.5 rounded-xl border border-amber-500/40 shadow-inner shrink-0">
+          <span class="text-amber-400 text-xs sm:text-sm">⚡</span>
           <div class="text-left">
             <span class="block text-xs font-black text-amber-300 leading-none tracking-wide" id="hudXp">0 XP</span>
-            <span class="text-[9px] text-slate-400 uppercase tracking-wider">Жалпы Ұпай</span>
+            <span class="hidden sm:inline text-[9px] text-slate-400 uppercase tracking-wider ml-0.5">Ұпай</span>
           </div>
         </div>
 
-        <!-- STUDENT REGISTRATION & PROFILE BUTTONS -->
-        <button onclick="openRegistrationModal()" id="headerRegisterBtn" class="px-3.5 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 font-extrabold text-xs transition border border-amber-500/40 flex items-center space-x-1.5 shadow-lg shadow-amber-500/10">
-          <span>📝</span>
-          <span class="hidden sm:inline" id="headerRegisterText">Тіркелу</span>
-        </button>
-
-        <!-- STUDENT PROFILE BUTTON (Opens Radar Chart Modal) -->
-        <button onclick="toggleProfileModal()" id="headerProfileBtn" class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-cyan-600 to-brand-600 hover:from-cyan-500 hover:to-brand-500 text-white font-extrabold text-xs transition shadow-lg shadow-brand-500/20 flex items-center space-x-2 border border-brand-400/30">
-          <span id="headerProfileIcon">👤</span>
-          <span class="hidden sm:inline" id="headerProfileName">Профиль & Радар</span>
-          <span class="sm:hidden" id="headerProfileNameMobile">Профиль</span>
+        <!-- Student Profile / Registration Button (Compact Icon on Mobile, No Text Clipping) -->
+        <button onclick="handleProfileOrRegisterClick()" id="headerProfileBtn" class="h-8 sm:h-9 w-8 sm:w-auto px-2 sm:px-3.5 rounded-xl bg-gradient-to-r from-cyan-600 to-brand-600 hover:from-cyan-500 hover:to-brand-500 text-white font-extrabold text-xs transition shadow-lg shadow-brand-500/20 flex items-center justify-center space-x-1.5 border border-brand-400/30 shrink-0">
+          <span id="headerProfileIcon" class="text-sm sm:text-base">👤</span>
+          <span class="hidden md:inline" id="headerProfileName">Профиль</span>
         </button>
 
         <!-- Language Selector -->
-        <div class="relative inline-block text-left">
-          <select id="langSelect" onchange="changeLanguage(this.value)" class="bg-space-850 text-xs text-slate-200 border border-slate-700 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-brand-500 font-bold cursor-pointer">
+        <div class="relative inline-block text-left shrink-0">
+          <select id="langSelect" onchange="changeLanguage(this.value)" class="bg-space-850 text-xs text-slate-200 border border-slate-700 rounded-xl px-2 py-1.5 focus:outline-none focus:border-brand-500 font-bold cursor-pointer">
             <option value="kz" selected>🇰🇿 KZ</option>
             <option value="ru">🇷🇺 RU</option>
             <option value="dual">🌐 Dual</option>
@@ -147,43 +173,43 @@
       </div>
     </div>
 
-    <!-- THE 6 MAIN SKILL BUTTONS (EXACT TABS FROM SPREADSHEET) -->
-    <div class="border-t border-slate-800 bg-space-950/80">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex space-x-2 overflow-x-auto py-2.5 no-scrollbar">
+      <!-- THE 6 MAIN SKILL BUTTONS (EXACT TABS FROM SPREADSHEET) -->
+    <div class="border-t border-slate-800 bg-space-950/95 sticky top-16 z-40 backdrop-blur-md">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex space-x-2 overflow-x-auto py-2.5 no-scrollbar touch-scroll scroll-smooth edge-fade-mask">
         
         <!-- 1. Blooket (Vocabulary) -->
-        <button onclick="switchMainPart('blooket_vocab')" id="nav-btn-blooket_vocab" class="part-nav-btn px-4 py-2 rounded-xl text-xs font-extrabold transition flex items-center space-x-2 bg-brand-500 text-white shadow-lg shadow-brand-500/25 whitespace-nowrap">
+        <button onclick="switchMainPart('blooket_vocab')" id="nav-btn-blooket_vocab" class="part-nav-btn shrink-0 whitespace-nowrap px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-xl text-xs font-extrabold transition flex items-center space-x-1.5 bg-brand-500 text-white shadow-lg shadow-brand-500/25">
           <span>🎮</span>
           <span>Blooket (Vocabulary)</span>
         </button>
 
         <!-- 2. Сабақтар (Reading) -->
-        <button onclick="switchMainPart('sabaktar_reading')" id="nav-btn-sabaktar_reading" class="part-nav-btn px-4 py-2 rounded-xl text-xs font-extrabold transition flex items-center space-x-2 bg-space-850 text-slate-400 hover:text-white hover:bg-space-800 whitespace-nowrap">
+        <button onclick="switchMainPart('sabaktar_reading')" id="nav-btn-sabaktar_reading" class="part-nav-btn shrink-0 whitespace-nowrap px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-xl text-xs font-extrabold transition flex items-center space-x-1.5 bg-space-850 text-slate-400 hover:text-white hover:bg-space-800">
           <span>📖</span>
           <span>Сабақтар (Reading)</span>
         </button>
 
         <!-- 3. Жаттау (Grammar) -->
-        <button onclick="switchMainPart('zhattau_grammar')" id="nav-btn-zhattau_grammar" class="part-nav-btn px-4 py-2 rounded-xl text-xs font-extrabold transition flex items-center space-x-2 bg-space-850 text-slate-400 hover:text-white hover:bg-space-800 whitespace-nowrap">
+        <button onclick="switchMainPart('zhattau_grammar')" id="nav-btn-zhattau_grammar" class="part-nav-btn shrink-0 whitespace-nowrap px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-xl text-xs font-extrabold transition flex items-center space-x-1.5 bg-space-850 text-slate-400 hover:text-white hover:bg-space-800">
           <span>🧠</span>
           <span>Жаттау (Grammar)</span>
         </button>
 
         <!-- 4. Тесттер (Writing) -->
-        <button onclick="switchMainPart('testter_writing')" id="nav-btn-testter_writing" class="part-nav-btn px-4 py-2 rounded-xl text-xs font-extrabold transition flex items-center space-x-2 bg-space-850 text-slate-400 hover:text-white hover:bg-space-800 whitespace-nowrap">
+        <button onclick="switchMainPart('testter_writing')" id="nav-btn-testter_writing" class="part-nav-btn shrink-0 whitespace-nowrap px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-xl text-xs font-extrabold transition flex items-center space-x-1.5 bg-space-850 text-slate-400 hover:text-white hover:bg-space-800">
           <span>📝</span>
           <span>Тесттер (Writing)</span>
         </button>
 
         <!-- 5. Номенклатура (Speaking) -->
-        <button onclick="switchMainPart('nomenklatura_speaking')" id="nav-btn-nomenklatura_speaking" class="part-nav-btn px-4 py-2 rounded-xl text-xs font-extrabold transition flex items-center space-x-2 bg-space-850 text-slate-400 hover:text-white hover:bg-space-800 whitespace-nowrap">
+        <button onclick="switchMainPart('nomenklatura_speaking')" id="nav-btn-nomenklatura_speaking" class="part-nav-btn shrink-0 whitespace-nowrap px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-xl text-xs font-extrabold transition flex items-center space-x-1.5 bg-space-850 text-slate-400 hover:text-white hover:bg-space-800">
           <span>🗣️</span>
           <span>Номенклатура (Speaking)</span>
           <span class="text-[9px] bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded border border-amber-500/30 font-semibold font-mono">Процесс үстінде</span>
         </button>
 
         <!-- 6. Видеолар (Listening) -->
-        <button onclick="switchMainPart('videolar_listening')" id="nav-btn-videolar_listening" class="part-nav-btn px-4 py-2 rounded-xl text-xs font-extrabold transition flex items-center space-x-2 bg-space-850 text-slate-400 hover:text-white hover:bg-space-800 whitespace-nowrap">
+        <button onclick="switchMainPart('videolar_listening')" id="nav-btn-videolar_listening" class="part-nav-btn shrink-0 whitespace-nowrap px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-xl text-xs font-extrabold transition flex items-center space-x-1.5 bg-space-850 text-slate-400 hover:text-white hover:bg-space-800">
           <span>🎬</span>
           <span>Видеолар (Listening)</span>
           <span class="text-[9px] bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded border border-amber-500/30 font-semibold font-mono">Процесс үстінде</span>
@@ -545,17 +571,17 @@
   </div>
 
   <!-- Main Active Content Container -->
-  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-4 sm:space-y-6 pb-32 sm:pb-20">
 
-    <!-- Active Part Banner -->
-    <div class="bg-gradient-to-r from-space-900 via-space-850 to-space-900 border border-slate-800 rounded-3xl p-5 sm:p-6 shadow-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-      <div class="flex items-center space-x-4">
-        <div class="w-14 h-14 rounded-2xl bg-brand-500/20 text-brand-400 border border-brand-500/30 flex items-center justify-center text-3xl shadow-inner" id="activePartIcon">
+        <!-- Active Part Banner (Mobile-Optimized & Polished Edges) -->
+    <div class="bg-gradient-to-r from-space-900 via-space-850 to-space-900 border border-slate-800/90 rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <div class="flex items-start sm:items-center space-x-3.5 sm:space-x-4">
+        <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-brand-500/20 text-brand-400 border border-brand-500/30 flex items-center justify-center text-2xl sm:text-3xl shadow-inner shrink-0" id="activePartIcon">
           🎮
         </div>
-        <div>
+        <div class="min-w-0 flex-1">
           <span class="text-[10px] font-extrabold uppercase tracking-widest text-brand-400" id="activePartBadge">1-БӨЛІМ (ТАБЛИЦА)</span>
-          <h1 class="text-xl sm:text-2xl font-black text-white mt-0.5" id="activePartTitle">Blooket (Vocabulary) — Сөздік және номенклатураны бекіту</h1>
+          <h1 class="text-lg sm:text-2xl font-black text-white mt-0.5 leading-snug" id="activePartTitle">Blooket (Vocabulary) — Сөздік және номенклатураны бекіту</h1>
           <p class="text-xs text-slate-400 mt-1 max-w-2xl leading-relaxed" id="activePartDesc">
             Кестедегі барлық 118 тақырып бойынша Blooket жинақтары. Ойнап болған соң «Аяқтадым (+20 XP)» басыңыз — радар диаграммасы өседі!
           </p>
@@ -563,12 +589,12 @@
       </div>
 
       <!-- Quick Action: Open 6-sided Radar modal -->
-      <button onclick="toggleProfileModal()" class="bg-space-950 hover:bg-space-850 px-4 py-2.5 rounded-2xl border border-slate-700/80 flex items-center space-x-3 transition">
+      <button onclick="toggleProfileModal()" class="w-full md:w-auto bg-space-950/80 hover:bg-space-850 px-4 py-2.5 rounded-xl sm:rounded-2xl border border-slate-700/80 flex items-center justify-between md:justify-start space-x-3 transition group shrink-0">
         <div class="text-left">
           <span class="text-[10px] text-slate-400 uppercase tracking-widest block font-bold">Радар диаграмма</span>
-          <span class="text-xs font-bold text-brand-400">Шеберлікті көру →</span>
+          <span class="text-xs font-bold text-brand-400 group-hover:text-brand-300 transition">Шеберлікті көру →</span>
         </div>
-        <span class="text-xl">📊</span>
+        <span class="text-xl group-hover:scale-110 transition">📊</span>
       </button>
     </div>
 
@@ -579,7 +605,7 @@
       <!-- Filter and search bar -->
       <div class="bg-space-900 border border-slate-800 rounded-2xl p-4 flex flex-col md:flex-row gap-3 justify-between items-center">
         <!-- Module pills inside Blooket -->
-        <div class="flex items-center space-x-2 overflow-x-auto w-full md:w-auto pb-1 md:pb-0" id="blooketModuleFilters">
+        <div class="flex items-center space-x-2 overflow-x-auto w-full md:w-auto pb-1 md:pb-0" id="blooketModuleFilters" class="flex items-center space-x-2 overflow-x-auto w-full md:w-auto pb-1 md:pb-0 touch-scroll edge-fade-mask">
           <button onclick="filterBlooket('all')" class="bk-pill px-3 py-1.5 rounded-lg text-xs font-bold bg-brand-500 text-white whitespace-nowrap" data-mod="all">
             Барлығы (118)
           </button>
@@ -779,17 +805,17 @@
     <!-- SECTION 3: ЖАТТАУ (GRAMMAR) - 44 BLOOKET LINKS                 -->
     <!-- ============================================================== -->
     <section id="section-zhattau_grammar" class="part-section hidden space-y-6">
-      <div class="flex items-center justify-between bg-space-900 border border-slate-800 rounded-2xl p-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-space-900 border border-slate-800 rounded-2xl p-4">
         <div>
           <h3 class="text-sm font-bold text-white">Жаттау тобын таңдаңыз / Выберите группу:</h3>
           <p class="text-xs text-slate-400">44 тақырып бойынша Қазақша және Орысша жеке Blooket жинақтары</p>
         </div>
-        <div class="flex space-x-2">
-          <button onclick="setZhattauLang('kz')" id="btnZhattauKz" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-brand-500 text-white">
-            🇰🇿 Қазақ тобы (44 Blooket)
+        <div class="grid grid-cols-2 gap-2 sm:flex sm:space-x-2 shrink-0">
+          <button onclick="setZhattauLang('kz')" id="btnZhattauKz" class="px-3 py-2 rounded-xl text-xs font-bold bg-brand-500 text-space-950 text-center font-bold">
+            🇰🇿 Қазақ тобы (44)
           </button>
-          <button onclick="setZhattauLang('ru')" id="btnZhattauRu" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-space-850 text-slate-400 hover:text-white">
-            🇷🇺 Русская группа (44 Blooket)
+          <button onclick="setZhattauLang('ru')" id="btnZhattauRu" class="px-3 py-2 rounded-xl text-xs font-bold bg-space-850 text-slate-400 hover:text-white border border-slate-700 text-center font-bold">
+            🇷🇺 Русская группа (44)
           </button>
         </div>
       </div>
@@ -1200,9 +1226,26 @@
       }
     };
 
-    // Gamification State (Saved in LocalStorage - Clean 0 Start for Students)
+        // Gamification State (Saved in LocalStorage - Clean 0 Start for Students)
     let userXp = parseInt(safeStorage.getItem('geotany_user_xp') || '0');
-    let completedBlooketTopics = new Set(JSON.parse(safeStorage.getItem('geotany_vocab_completed') || '[]'));
+    // Auto-wipe legacy test XP (850 or 880):
+    if (userXp === 850 || userXp === 880 || isNaN(userXp)) {
+      userXp = 0;
+      safeStorage.setItem('geotany_user_xp', '0');
+    }
+
+    let storedCompleted = safeStorage.getItem('geotany_vocab_completed');
+    let completedBlooketTopics;
+    try {
+      let parsed = JSON.parse(storedCompleted || '[]');
+      if (Array.isArray(parsed) && (parsed.includes(71) || parsed.includes(65) || (parsed.length > 5 && userXp === 0))) {
+        parsed = [];
+        safeStorage.setItem('geotany_vocab_completed', '[]');
+      }
+      completedBlooketTopics = new Set(parsed);
+    } catch(e) {
+      completedBlooketTopics = new Set();
+    }
 
     let skillScores = {
       vocab: 0,
@@ -1720,6 +1763,15 @@
 
     let studentProfile = JSON.parse(safeStorage.getItem('geotany_user_profile') || 'null');
 
+        function handleProfileOrRegisterClick() {
+      const isReg = studentProfile && studentProfile.isRegistered;
+      if (isReg) {
+        toggleProfileModal();
+      } else {
+        openRegistrationModal(false);
+      }
+    }
+
     function initStudentProfile() {
       const savedProfile = safeStorage.getItem('geotany_user_profile');
       if (savedProfile) {
@@ -1730,41 +1782,46 @@
         }
       }
 
+      // If user is not properly registered, force reset any legacy mock data on their mobile device
       if (!studentProfile || !studentProfile.isRegistered) {
         studentProfile = null;
+        userXp = 0;
+        completedBlooketTopics.clear();
+        completedLessons.clear();
+        writingTestScores = {};
+        safeStorage.setItem('geotany_user_xp', '0');
+        safeStorage.removeItem('geotany_completed_blooket');
+        safeStorage.setItem('geotany_vocab_completed', '[]');
+        safeStorage.setItem('geotany_completed_lessons', '[]');
+        safeStorage.setItem('geotany_writing_scores', '{}');
+        updateVocabScore();
+        updateReadingScore();
+        updateWritingScore();
+        updateRadarChart();
+        updateHud();
         updateProfileUI();
-        // Mandatory registration gate on startup!
         setTimeout(() => {
           openRegistrationModal(false);
         }, 200);
       } else {
         updateProfileUI();
+        updateHud();
+        updateRadarChart();
       }
     }
 
     function updateProfileUI() {
       const isReg = studentProfile && studentProfile.isRegistered;
-      const regBtn = document.getElementById('headerRegisterBtn');
-      const regBtnText = document.getElementById('headerRegisterText');
       const profileName = document.getElementById('headerProfileName');
-      const profileNameMobile = document.getElementById('headerProfileNameMobile');
       const profileIcon = document.getElementById('headerProfileIcon');
-
       const isRu = (currentLang === 'ru');
 
       if (isReg) {
-        if (regBtn) regBtn.classList.add('hidden');
         const shortName = studentProfile.name.split(' ')[0];
-        if (profileName) profileName.textContent = `${shortName} (${studentProfile.grade || '11-сынып'})`;
-        if (profileNameMobile) profileNameMobile.textContent = shortName;
+        if (profileName) profileName.textContent = `${shortName}`;
         if (profileIcon) profileIcon.textContent = '🎓';
       } else {
-        if (regBtn) {
-          regBtn.classList.remove('hidden');
-          if (regBtnText) regBtnText.textContent = isRu ? 'Регистрация' : 'Тіркелу';
-        }
-        if (profileName) profileName.textContent = isRu ? 'Профиль & Радар' : 'Профиль & Радар';
-        if (profileNameMobile) profileNameMobile.textContent = isRu ? 'Профиль' : 'Профиль';
+        if (profileName) profileName.textContent = isRu ? 'Регистрация' : 'Тіркелу';
         if (profileIcon) profileIcon.textContent = '👤';
       }
 
@@ -1987,7 +2044,7 @@
       const isDual = (currentLang === 'dual');
 
       // Top brand sub-text
-      const subTextEl = document.querySelector('header .text-xs.text-slate-400');
+      const subTextEl = document.getElementById('headerSubtitle');
       if (subTextEl) {
         subTextEl.textContent = isRu 
           ? 'Все 118 тематических наборов Blooket и 6-навыковая система'
@@ -2241,10 +2298,10 @@
         const sec = document.getElementById(`section-${p}`);
 
         if (p === partId) {
-          btn.className = "part-nav-btn px-4 py-2 rounded-xl text-xs font-extrabold transition flex items-center space-x-2 bg-brand-500 text-white shadow-lg shadow-brand-500/25 whitespace-nowrap";
+          btn.className = "part-nav-btn shrink-0 whitespace-nowrap px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-xl text-xs font-extrabold transition flex items-center space-x-1.5 bg-brand-500 text-white shadow-lg shadow-brand-500/25";
           sec.classList.remove('hidden');
         } else {
-          btn.className = "part-nav-btn px-4 py-2 rounded-xl text-xs font-extrabold transition flex items-center space-x-2 bg-space-850 text-slate-400 hover:text-white hover:bg-space-800 whitespace-nowrap";
+          btn.className = "part-nav-btn shrink-0 whitespace-nowrap px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-xl text-xs font-extrabold transition flex items-center space-x-1.5 bg-space-850 text-slate-400 hover:text-white hover:bg-space-800";
           sec.classList.add('hidden');
         }
       });
@@ -2440,7 +2497,7 @@
         const bkRu = item.blooket_ru || '';
 
         const row = document.createElement('div');
-        row.className = "py-3.5 flex flex-wrap items-center justify-between gap-3 text-xs border-b border-slate-800/80 last:border-b-0";
+        row.className = "py-3 sm:py-3.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5 text-xs border-b border-slate-800/80 last:border-b-0";
 
         let buttonsHtml = '';
         if (isRu) {
@@ -2492,14 +2549,14 @@
         }
 
         row.innerHTML = `
-          <div class="flex items-center space-x-3">
-            <span class="w-7 h-7 rounded-lg bg-space-850 flex items-center justify-center font-bold text-slate-400 border border-slate-800">#${item.num || idx + 1}</span>
-            <div>
-              <span class="font-extrabold text-white block text-sm">${title}</span>
-              <span class="text-[11px] text-slate-400">${test || (isRu ? 'Тематический тест' : 'Тақырыптық тест жинағы')}</span>
+          <div class="flex items-start space-x-2.5">
+            <span class="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-space-850 flex items-center justify-center font-bold text-slate-400 border border-slate-800 shrink-0 text-[11px] sm:text-xs mt-0.5">#${item.num || idx + 1}</span>
+            <div class="min-w-0 flex-1">
+              <span class="font-extrabold text-white block text-xs sm:text-sm leading-snug">${title}</span>
+              <span class="text-[10px] sm:text-[11px] text-slate-400 block mt-0.5">${test || (isRu ? 'Тематический тест' : 'Тақырыптық тест жинағы')}</span>
             </div>
           </div>
-          <div class="flex items-center space-x-2">
+          <div class="flex flex-wrap items-center gap-1.5 pl-8 sm:pl-0 pt-0.5 sm:pt-0">
             ${buttonsHtml}
           </div>
         `;
